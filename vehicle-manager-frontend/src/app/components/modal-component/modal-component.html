@@ -1,0 +1,48 @@
+<!-- modal-component.html -->
+<div
+  class="modal fade"
+  [class.show]="isVisible"
+  [class.d-block]="isVisible"
+  tabindex="-1"
+  role="dialog"
+  aria-modal="true"
+  *ngIf="isVisible"
+  (click)="close()"
+>
+  <div class="modal-dialog" role="document" (click)="$event.stopPropagation()">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ options?.title || "Aviso" }}</h5>
+        <button
+          type="button"
+          class="btn-close"
+          aria-label="Close"
+          (click)="close()"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <p>{{ options?.message }}</p>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="cancel()"
+          *ngIf="options?.cancelText !== undefined"
+        >
+          {{ options?.cancelText || "Cancelar" }}
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="confirm()"
+          *ngIf="options?.confirmText !== undefined"
+        >
+          {{ options?.confirmText || "Confirmar" }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop fade show" *ngIf="isVisible"></div>

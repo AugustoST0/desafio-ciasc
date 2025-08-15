@@ -1,0 +1,47 @@
+<div class="d-flex justify-content-center align-items-center vh-100">
+  <div class="card shadow p-4" style="width: 100%; max-width: 400px">
+    <h2 class="text-center mb-4">Task Manager - Cadastro</h2>
+
+    <form [formGroup]="registerForm" (ngSubmit)="submit()">
+      <div class="mb-3">
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Digite seu nome"
+          formControlName="name"
+        />
+      </div>
+      <div class="mb-3">
+        <input
+          type="email"
+          class="form-control"
+          placeholder="Digite seu e-mail"
+          formControlName="email"
+        />
+      </div>
+      <div class="mb-3">
+        <input
+          type="password"
+          class="form-control"
+          placeholder="Digite sua senha"
+          formControlName="password"
+        />
+      </div>
+      <div class="mb-3">
+        <input
+          type="password"
+          class="form-control"
+          placeholder="Confirme sua senha"
+          formControlName="confirmPassword"
+        />
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100">Enviar</button>
+    </form>
+
+    <p class="text-center mt-3 mb-0">
+      Já tem conta?
+      <a routerLink="/login" class="text-decoration-none">Faça login</a>
+    </p>
+  </div>
+</div>
