@@ -3,6 +3,7 @@ import { Login } from './components/pages/login/login';
 import { Cadastro } from './components/pages/cadastro/cadastro';
 import { Layout } from './components/layout/layout';
 import { Dashboard } from './components/pages/dashboard/dashboard';
+import { VehiclePage } from './components/pages/vehicle-page/vehicle-page';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
@@ -13,6 +14,7 @@ export const routes: Routes = [
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', component: Dashboard },
+      { path: 'vehicle-page', component: VehiclePage },
     ],
   },
 ];
