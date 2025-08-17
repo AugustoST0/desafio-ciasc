@@ -6,9 +6,9 @@ import {
   FormGroup,
   ReactiveFormsModule,
 } from '@angular/forms';
-import { UserService } from '../../../services/user-service';
+import { UserService } from '../../../services/api/user-service';
 import { ToastrService } from 'ngx-toastr';
-import { AuthService } from '../../../services/auth-service';
+import { AuthService } from '../../../services/api/auth-service';
 import { take } from 'rxjs';
 
 @Component({
@@ -36,11 +36,13 @@ export class Cadastro implements OnInit {
   }
 
   ngOnInit() {
-    this.authService.loggedIn$.pipe(take(1)).subscribe((isLoggedIn) => {
-      if (isLoggedIn) {
-        this.router.navigate(['/tasks']);
-      }
-    });
+    this.authService.currentUser$
+      .pipe(take(1))
+      .subscribe((currentUserExists) => {
+        if (currentUserExists) {
+          this.router.navigate(['/dashboard']);
+        }
+      });
   }
 
   submit() {
@@ -64,9 +66,9 @@ export class Cadastro implements OnInit {
       password: password,
     };
 
-    this.userService.registerUser(userPayload).subscribe({
+    this.userService.register(userPayload).subscribe({
       next: () => {
-        this.toastr.info('Usuário cadastrado com sucesso.', 'Sucesso');
+        this.toastr.success('Usuário cadastrado com sucesso.', 'Sucesso');
         this.router.navigate(['/login']);
       },
       error: (err) => {

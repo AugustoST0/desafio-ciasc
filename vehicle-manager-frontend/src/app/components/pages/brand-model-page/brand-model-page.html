@@ -1,0 +1,74 @@
+<!-- Marcas -->
+<div class="d-flex justify-content-between align-items-center mb-4 w-100">
+  <h2>Marcas</h2>
+  <button class="btn btn-primary" (click)="openBrandForm()">
+    <i class="bi bi-plus-lg"></i> Adicionar Marca
+  </button>
+</div>
+
+<div class="row g-3 mb-5">
+  @for (brand of brands; track brand.id) {
+  <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+    <div class="card h-100 shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title mb-3">{{ brand.name }}</h5>
+      </div>
+      <div class="card-footer d-flex justify-content-between">
+        <button
+          class="btn btn-sm btn-outline-secondary"
+          (click)="openBrandForm(brand)"
+        >
+          <i class="bi bi-pencil"></i> Editar
+        </button>
+        <button
+          class="btn btn-sm btn-outline-danger"
+          (click)="confirmDeleteBrand(brand.id)"
+        >
+          <i class="bi bi-trash"></i> Excluir
+        </button>
+      </div>
+    </div>
+  </div>
+  } @if (brands.length === 0) {
+  <div>Não há marcas cadastradas.</div>
+  }
+</div>
+
+<!-- Modelos -->
+<div class="d-flex justify-content-between align-items-center mb-4 w-100">
+  <h2>Modelos</h2>
+  <button class="btn btn-primary" (click)="openModelForm()">
+    <i class="bi bi-plus-lg"></i> Adicionar Modelo
+  </button>
+</div>
+
+<div class="row g-3">
+  @for(model of models; track model.id) {
+  <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+    <div class="card h-100 shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title mb-3">{{ model.name }}</h5>
+        <p class="card-text mb-1">
+          <strong>Marca:</strong> {{ model.brand.name }}
+        </p>
+      </div>
+      <div class="card-footer d-flex justify-content-between">
+        <button
+          class="btn btn-sm btn-outline-secondary"
+          (click)="openModelForm(model)"
+        >
+          <i class="bi bi-pencil"></i> Editar
+        </button>
+        <button
+          class="btn btn-sm btn-outline-danger"
+          (click)="confirmDeleteModel(model.id!)"
+        >
+          <i class="bi bi-trash"></i> Excluir
+        </button>
+      </div>
+    </div>
+  </div>
+  } @if (models.length === 0) {
+  <div>Não há modelos cadastrados.</div>
+  }
+</div>

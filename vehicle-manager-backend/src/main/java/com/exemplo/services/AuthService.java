@@ -3,9 +3,7 @@ package com.exemplo.services;
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import com.exemplo.exception.exceptions.InvalidCredentialsException;
 import com.exemplo.exception.exceptions.InvalidRefreshTokenException;
-import com.exemplo.model.user.LoginRequestDTO;
-import com.exemplo.model.user.TokenResponseDTO;
-import com.exemplo.model.user.User;
+import com.exemplo.model.user.*;
 import com.exemplo.security.JWTTokenProvider;
 import io.smallrye.jwt.auth.principal.JWTParser;
 import io.smallrye.jwt.auth.principal.ParseException;
@@ -13,6 +11,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.eclipse.microprofile.jwt.JsonWebToken;
+import org.jose4j.jwk.Use;
 
 @ApplicationScoped
 public class AuthService {
@@ -47,7 +46,7 @@ public class AuthService {
             JsonWebToken jwt = jwtParser.parse(refreshToken);
             String email = jwt.getSubject();
 
-            var user = userService.getUserByEmail(email);
+            User user = userService.getUserByEmail(email);
 
             String newAccessToken = jwtTokenProvider.generateAccessToken(email);
             String newRefreshToken = jwtTokenProvider.generateRefreshToken(email);

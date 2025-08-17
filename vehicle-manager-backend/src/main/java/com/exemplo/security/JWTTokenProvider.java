@@ -32,8 +32,9 @@ public class JWTTokenProvider {
         return Jwt.issuer(issuer)
                 .subject(email)
                 .claim("userId", user.getId())
+                .claim("userName", user.getName())
                 .groups(groups)
-                .expiresIn(Duration.ofMinutes(15))
+                .expiresIn(Duration.ofMinutes(60))
                 .sign();
     }
 

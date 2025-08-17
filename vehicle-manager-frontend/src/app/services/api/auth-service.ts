@@ -1,14 +1,15 @@
 import { Injectable } from '@angular/core';
 
-import { environment } from '../environments/environment';
+import { environment } from '../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
-import { TokenResponseDTO } from '../interfaces/TokenResponseDTO';
+import { TokenResponseDTO } from '../../interfaces/TokenResponseDTO';
 import { Router } from '@angular/router';
 import { jwtDecode } from 'jwt-decode';
-import { JwtPayload } from '../interfaces/JwtPayload';
-import { ModalService } from './modal-service';
+import { JwtPayload } from '../../interfaces/JwtPayload';
+import { ModalService } from '../modal-service';
 import { ToastrService } from 'ngx-toastr';
+import { User } from '../../interfaces/User';
 
 @Injectable({
   providedIn: 'root',
@@ -19,17 +20,31 @@ export class AuthService {
 
   private refreshInterval: any;
 
-  private loggedInSubject = new BehaviorSubject<boolean>(
-    !!localStorage.getItem('accessToken')
-  );
-  loggedIn$ = this.loggedInSubject.asObservable();
+  private currentUserSubject = new BehaviorSubject<User | null>(null);
+  currentUser$ = this.currentUserSubject.asObservable();
 
   constructor(
     private http: HttpClient,
     private router: Router,
     private modalService: ModalService,
     private toastr: ToastrService
-  ) {}
+  ) {
+    this.loadUserFromToken();
+  }
+
+  private loadUserFromToken() {
+    const token = localStorage.getItem('accessToken');
+    if (!token) return;
+
+    const decoded = jwtDecode<JwtPayload>(token);
+    const user: User = {
+      id: decoded.userId,
+      name: decoded.userName,
+      email: decoded.sub,
+    };
+
+    this.currentUserSubject.next(user);
+  }
 
   login(credencials: {
     email: string;
@@ -41,8 +56,8 @@ export class AuthService {
         tap((tokens: TokenResponseDTO) => {
           localStorage.setItem('accessToken', tokens.accessToken);
           localStorage.setItem('refreshToken', tokens.refreshToken);
+          this.loadUserFromToken();
           this.startTokenRefreshTimer();
-          this.loggedInSubject.next(true);
         })
       );
   }
@@ -64,7 +79,7 @@ export class AuthService {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     this.stopTokenRefreshTimer();
-    this.loggedInSubject.next(false);
+    this.currentUserSubject.next(null);
     this.modalService.close();
     this.router.navigate(['/login']);
   }
@@ -94,9 +109,11 @@ export class AuthService {
     }, delay);
   }
 
-  public tryRefreshOrLogout() {
+  public tryRefreshOrLogout(retryCount = 0) {
     this.refreshToken().subscribe({
-      next: () => this.toastr.info('Token atualizado', 'Sessão revalidada'),
+      next: () => {
+        this.loadUserFromToken();
+      },
       error: (err) => {
         if (err.status === 401) {
           this.toastr.error('Token inválido', 'Erro');
@@ -104,6 +121,27 @@ export class AuthService {
         } else if (err.status === 403) {
           this.toastr.error('Acesso negado', 'Erro');
           this.logout();
+        }
+        // erro de rede
+        else if (err.status === 0 || !err.status) {
+          if (retryCount < 3) {
+            const retryDelay = Math.pow(2, retryCount) * 1000; // backoff: 1s, 2s, 4s
+            this.toastr.warning(
+              `Problema de conexão. Tentando novamente em ${
+                retryDelay / 1000
+              }s...`,
+              'Conexão instável'
+            );
+            setTimeout(() => {
+              this.tryRefreshOrLogout(retryCount + 1);
+            }, retryDelay);
+          } else {
+            this.toastr.error(
+              'Não foi possível renovar a sessão após várias tentativas',
+              'Erro de rede'
+            );
+            this.logout();
+          }
         } else {
           this.toastr.error('Erro inesperado ao renovar token', 'Erro');
           this.logout();

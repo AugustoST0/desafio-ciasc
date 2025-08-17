@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { Vehicle } from '../../../interfaces/Vehicle';
-import { VehicleService } from '../../../services/vehicle-service';
-import { VehicleFormService } from '../../../services/vehicle-form-service';
+import { VehicleService } from '../../../services/api/vehicle-service';
+import { VehicleFormService } from '../../../services/form/vehicle-form-service';
 import { ToastrService } from 'ngx-toastr';
 import { ModalService } from '../../../services/modal-service';
 
@@ -31,6 +31,17 @@ export class VehiclePage implements OnInit {
         this.toastr.error('Erro ao resgatar itens', 'Erro');
         console.error(err);
       },
+    });
+
+    this.vehicleFormService.vehicleInserted$.subscribe((vehicle: Vehicle) => {
+      this.vehicles.push(vehicle);
+    });
+
+    this.vehicleFormService.vehicleUpdated$.subscribe((vehicle: Vehicle) => {
+      const index = this.vehicles.findIndex((v) => v.id === vehicle.id);
+      if (index !== -1) {
+        this.vehicles[index] = vehicle;
+      }
     });
   }
 
@@ -62,7 +73,8 @@ export class VehiclePage implements OnInit {
   deleteVehicle(id: number) {
     this.vehicleService.delete(id).subscribe({
       next: () => {
-        this.toastr.info('O veículo foi deletado com sucesso', 'Sucesso');
+        this.vehicles = this.vehicles.filter((v) => v.id !== id);
+        this.toastr.success('O veículo foi deletado com sucesso', 'Sucesso');
       },
       error: (err) => {
         this.toastr.error('Erro ao deletar veículo', 'Erro');

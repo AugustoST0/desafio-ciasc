@@ -1,4 +1,4 @@
 export interface TokenResponseDTO {
-    accessToken: string,
-    refreshToken: string
+  accessToken: string;
+  refreshToken: string;
 }

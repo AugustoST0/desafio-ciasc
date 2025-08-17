@@ -1,5 +1,7 @@
 package com.exemplo.model.vehicle;
 
+import com.exemplo.model.brand.Brand;
+import com.exemplo.model.modelo.Modelo;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -18,10 +20,14 @@ public class Vehicle {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotBlank
-    private String brand;
-    @NotBlank
-    private String model;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "brand_id")
+    @NotNull
+    private Brand brand;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "model_id")
+    @NotNull
+    private Modelo model;
     @NotNull
     private int year;
     @NotBlank

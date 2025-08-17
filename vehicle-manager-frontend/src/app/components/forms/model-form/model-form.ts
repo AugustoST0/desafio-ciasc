@@ -1,0 +1,124 @@
+import { Component, OnInit } from '@angular/core';
+import { Model } from '../../../interfaces/Model';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { ModelFormService } from '../../../services/form/model-form-service';
+import { Brand } from '../../../interfaces/Brand';
+import { CommonModule } from '@angular/common';
+import { ToastrService } from 'ngx-toastr';
+import { ModelService } from '../../../services/api/model-service';
+import { BrandService } from '../../../services/api/brand-service';
+
+@Component({
+  selector: 'app-model-form',
+  imports: [CommonModule, ReactiveFormsModule],
+  templateUrl: './model-form.html',
+  styleUrl: './model-form.css',
+})
+export class ModelForm implements OnInit {
+  modelForm!: FormGroup;
+  isVisible = false;
+  isEditing = false;
+
+  brands: Brand[] = [];
+
+  constructor(
+    private fb: FormBuilder,
+    private modelFormService: ModelFormService,
+    private toastr: ToastrService,
+    private modelService: ModelService,
+    private brandService: BrandService
+  ) {}
+
+  ngOnInit() {
+    this.modelForm = this.fb.group({
+      id: [null],
+      name: ['', Validators.required],
+      brand: [null, Validators.required],
+    });
+
+    this.modelFormService.isVisible$.subscribe((visible) => {
+      this.isVisible = visible;
+    });
+
+    this.modelFormService.modelData$.subscribe((model) => {
+      if (model) {
+        this.isEditing = true;
+        this.modelForm.patchValue({
+          id: model.id,
+          name: model.name,
+          brand: model.brand.id,
+        });
+      } else {
+        this.isEditing = false;
+        this.modelForm.reset();
+      }
+    });
+
+    this.brandService.brands$.subscribe((brands) => {
+      this.brands = brands;
+    });
+
+    this.brandService.getAll().subscribe({
+      error: (err) => {
+        this.toastr.error('Erro ao resgatar dados', 'Erro');
+        console.error(err);
+      },
+    });
+  }
+
+  onSubmit() {
+    const selectedBrandId = Number(this.modelForm.value.brand);
+    const selectedBrand = this.brands.find((b) => b.id === selectedBrandId)!;
+
+    const model: Model = {
+      id: this.modelForm.value.id,
+      name: this.modelForm.value.name,
+      brand: selectedBrand,
+    };
+
+    console.log(model);
+
+    if (this.isEditing && model.id) {
+      if (this.modelForm.pristine) {
+        this.toastr.info(
+          'Você deve fazer alterações',
+          'Nenhuma mudança detectada'
+        );
+        return;
+      }
+
+      // update
+      this.modelService.update(model.id, model).subscribe({
+        next: () => {
+          this.toastr.success('Modelo atualizado com sucesso', 'Sucesso');
+          this.close();
+        },
+        error: (err) => {
+          this.toastr.error('Erro ao atualizar modelo', 'Erro');
+          console.error(err);
+        },
+      });
+    } else {
+      // insert
+      this.modelService.insert(model).subscribe({
+        next: () => {
+          this.toastr.success('Modelo adicionado com sucesso', 'Sucesso');
+          this.close();
+        },
+        error: (err) => {
+          this.toastr.error('Erro ao adicionar modelo', 'Erro');
+          console.error(err);
+        },
+      });
+    }
+  }
+
+  close() {
+    this.modelFormService.close();
+  }
+}

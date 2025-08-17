@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AuthService } from './auth-service';
+import { AuthService } from './api/auth-service';
 import { ModalService } from './modal-service';
 import { ToastrService } from 'ngx-toastr';
 
@@ -21,8 +21,8 @@ export class ActivityMonitorService {
     private modalService: ModalService,
     private toastr: ToastrService
   ) {
-    this.authService.loggedIn$.subscribe((isLoggedIn) => {
-      if (isLoggedIn) this.initMonitoring();
+    this.authService.currentUser$.subscribe((currentUser) => {
+      if (currentUser) this.initMonitoring();
       else this.stopMonitoring();
     });
   }

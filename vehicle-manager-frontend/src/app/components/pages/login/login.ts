@@ -7,7 +7,7 @@ import {
 } from '@angular/forms';
 
 import { Router, RouterModule } from '@angular/router';
-import { AuthService } from '../../../services/auth-service';
+import { AuthService } from '../../../services/api/auth-service';
 import { CommonModule } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
 import { take } from 'rxjs';
@@ -34,11 +34,13 @@ export class Login implements OnInit {
   }
 
   ngOnInit() {
-    this.authService.loggedIn$.pipe(take(1)).subscribe((isLoggedIn) => {
-      if (isLoggedIn) {
-        this.router.navigate(['/dashboard']);
-      }
-    });
+    this.authService.currentUser$
+      .pipe(take(1))
+      .subscribe((currentUserExists) => {
+        if (currentUserExists) {
+          this.router.navigate(['/dashboard']);
+        }
+      });
   }
 
   submit() {
@@ -50,7 +52,7 @@ export class Login implements OnInit {
 
     this.authService.login(this.loginForm.value).subscribe({
       next: () => {
-        this.toastr.info('Login efetivado com sucesso.', 'Sucesso');
+        this.toastr.success('Login efetivado com sucesso.', 'Sucesso');
         this.router.navigate(['/dashboard']);
       },
       error: (err) => {

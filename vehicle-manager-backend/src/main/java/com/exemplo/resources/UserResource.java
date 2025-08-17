@@ -23,44 +23,37 @@ public class UserResource {
 
     @GET
     public Response getAll() {
-        List<User> users = userService.getAllUsers();
+        List<User> users = userService.getAll();
         return Response.ok(users).build();
     }
 
     @GET
     @Path("/{id}")
     public Response getById(@PathParam("id") Long id) {
-        User user = userService.getUserById(id);
-        return Response.ok(user).build();
-    }
-
-    @GET
-    @Path("/byEmail")
-    public Response getByEmail(@QueryParam("email") String email) {
-        User user = userService.getUserByEmail(email);
+        User user = userService.getById(id);
         return Response.ok(user).build();
     }
 
     @POST
     @Path("/register")
     public Response register(@Valid User user) {
-        User createdUser = userService.registerUser(user);
+        User createdUser = userService.register(user);
         return Response.status(Response.Status.CREATED).entity(createdUser).build();
     }
 
     @PUT
     @Path("/{id}")
     @RolesAllowed("USER")
-    public Response update(@PathParam("id") Long id, User user) {
-        userService.updateUser(id, user);
-        return Response.noContent().build();
+    public Response update(@PathParam("id") Long id, User updatedUser) {
+        User user = userService.update(id, updatedUser);
+        return Response.ok(user).build();
     }
 
     @DELETE
     @Path("/{id}")
     @RolesAllowed("USER")
-    public Response deleteById(@PathParam("id") Long id) {
-        userService.deleteUserById(id);
+    public Response delete(@PathParam("id") Long id) {
+        userService.delete(id);
         return Response.noContent().build();
     }
 }

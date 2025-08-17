@@ -16,11 +16,11 @@ public class UserService {
     @Inject
     UserRepository userRepository;
 
-    public List<User> getAllUsers() {
+    public List<User> getAll() {
         return userRepository.listAll();
     }
 
-    public User getUserById(Long id) {
+    public User getById(Long id) {
         User user = userRepository.findById(id);
 
         if (user == null) {
@@ -41,7 +41,7 @@ public class UserService {
     }
 
     @Transactional
-    public User registerUser(User user) {
+    public User register(User user) {
         String hashedPassword = BCrypt.withDefaults().hashToString(12, user.getPassword().toCharArray());
 
         user.setPassword(hashedPassword);
@@ -50,8 +50,8 @@ public class UserService {
     }
 
     @Transactional
-    public void updateUser(Long id, User updatedUser) {
-        User user = getUserById(id);
+    public User update(Long id, User updatedUser) {
+        User user = getById(id);
 
         if (updatedUser.getName() != null) {
             user.setName(updatedUser.getName());
@@ -67,12 +67,12 @@ public class UserService {
             user.setPassword(hashedPassword);
         }
 
-        userRepository.persist(user);
+        return userRepository.save(user);
     }
 
     @Transactional
-    public void deleteUserById(Long id) {
-        User user = getUserById(id);
+    public void delete(Long id) {
+        User user = getById(id);
         userRepository.deleteById(id);
     }
 }

@@ -36,7 +36,7 @@ public class VehicleService {
         vehicle.setModel(updatedVehicle.getModel());
         vehicle.setYear(updatedVehicle.getYear());
         vehicle.setPlate(updatedVehicle.getPlate());
-        vehicle.setType(updatedVehicle.getType());
+        vehicle.setVehicleType(updatedVehicle.getVehicleType());
         return vehicle;
     }
 

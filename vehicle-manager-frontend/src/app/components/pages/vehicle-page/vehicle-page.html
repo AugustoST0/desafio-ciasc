@@ -1,43 +1,43 @@
-<div class="container vw-100">
-  <!-- Botão para adicionar veículo -->
-  <div class="d-flex justify-content-between align-items-center">
-    <h2>Veículos</h2>
-    <button class="btn btn-primary" (click)="openFormToCreate()">
-      <i class="bi bi-plus-lg"></i> Adicionar Veículo
-    </button>
-  </div>
+<div class="d-flex justify-content-between align-items-center mb-4 w-100">
+  <h2>Veículos</h2>
+  <button class="btn btn-primary" (click)="openFormToCreate()">
+    <i class="bi bi-plus-lg"></i> Adicionar Veículo
+  </button>
+</div>
 
-  <!-- Grid de veículos -->
-  <div class="row g-3">
-    @for (vehicle of vehicles; track vehicle.id) {
-    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-      <div class="card h-100 shadow-sm">
-        <div class="card-body">
-          <h5 class="card-title mb-3">{{ vehicle.brand }} {{ vehicle.model }}</h5>
-          <p class="card-text mb-1"><strong>Ano:</strong> {{ vehicle.year }}</p>
-          <p class="card-text mb-1">
-            <strong>Placa:</strong> {{ vehicle.plate }}
-          </p>
-          <p class="card-text mb-1">
-            <strong>Tipo:</strong> {{ vehicle.vehicleType }}
-          </p>
-        </div>
-        <div class="card-footer d-flex justify-content-between">
-          <button
-            class="btn btn-sm btn-outline-secondary"
-            (click)="openFormToEdit(vehicle)"
-          >
-            <i class="bi bi-pencil"></i> Editar
-          </button>
-          <button
-            class="btn btn-sm btn-outline-danger"
-            (click)="confirmDeleteVehicle(vehicle.id!)"
-          >
-            <i class="bi bi-trash"></i> Excluir
-          </button>
-        </div>
+<!-- Grid de veículos -->
+<div class="row g-3">
+  @for (vehicle of vehicles; track vehicle.id) {
+  <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+    <div class="card h-100 shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title mb-3">{{ vehicle.brand.name }} {{ vehicle.model.name }}</h5>
+        <p class="card-text mb-1"><strong>Ano:</strong> {{ vehicle.year }}</p>
+        <p class="card-text mb-1">
+          <strong>Placa:</strong> {{ vehicle.plate }}
+        </p>
+        <p class="card-text mb-1">
+          <strong>Tipo:</strong> {{ vehicle.vehicleType }}
+        </p>
+      </div>
+      <div class="card-footer d-flex justify-content-between">
+        <button
+          class="btn btn-sm btn-outline-secondary"
+          (click)="openFormToEdit(vehicle)"
+        >
+          <i class="bi bi-pencil"></i> Editar
+        </button>
+        <button
+          class="btn btn-sm btn-outline-danger"
+          (click)="confirmDeleteVehicle(vehicle.id!)"
+        >
+          <i class="bi bi-trash"></i> Excluir
+        </button>
       </div>
     </div>
-    }
   </div>
+  }
 </div>
+@if (vehicles.length === 0) {
+<div>Não há veículos cadastrados.</div>
+}
