@@ -5,6 +5,7 @@ import com.exemplo.services.ModeloService;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -38,7 +39,7 @@ public class ModeloResource {
 
     @POST
     @RolesAllowed("ADMIN")
-    public Response insert(Modelo modelo) {
+    public Response insert(@Valid Modelo modelo) {
         Modelo created = modeloService.insert(modelo);
         return Response.status(Response.Status.CREATED).entity(created).build();
     }
@@ -46,7 +47,7 @@ public class ModeloResource {
     @PUT
     @Path("/{id}")
     @RolesAllowed("ADMIN")
-    public Response update(@PathParam("id") Long id, Modelo updatedModelo) {
+    public Response update(@PathParam("id") Long id, @Valid Modelo updatedModelo) {
         Modelo modelo = modeloService.update(id, updatedModelo);
 
         return Response.ok(modelo).build();

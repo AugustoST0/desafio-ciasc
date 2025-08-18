@@ -15,20 +15,29 @@ public class PersistenceExceptionMapper implements ExceptionMapper<PersistenceEx
         if (e instanceof ConstraintViolationException cve) {
             String msg = cve.getMessage().toLowerCase();
 
-            // Caso de e-mail duplicado
-            if (msg.contains("duplicate entry") && msg.contains("email")) {
-                return Response.status(Response.Status.CONFLICT)
-                        .entity(new ErrorResponse("E-mail já cadastrado", "EMAIL_ALREADY_EXISTS"))
-                        .build();
-            }
-
-            if (msg.contains("cannot delete") || msg.contains("foreign key constraint fails")) {
-                return Response.status(Response.Status.CONFLICT)
-                        .entity(new ErrorResponse(
-                                "Não é possível deletar este registro porque existem registros associados a ele",
-                                "ASSOCIATED_RECORDS_EXIST"
-                        ))
-                        .build();
+            if (msg.contains("duplicate entry")) {
+                if (msg.contains("email")) {
+                    return Response.status(Response.Status.CONFLICT)
+                            .entity(new ErrorResponse("E-mail já cadastrado", "EMAIL_ALREADY_EXISTS"))
+                            .build();
+                }
+                if (msg.contains("plate")) {
+                    return Response.status(Response.Status.CONFLICT)
+                            .entity(new ErrorResponse("Placa já cadastrada", "PLATE_ALREADY_EXISTS"))
+                            .build();
+                }
+                if (msg.contains("name")) {
+                    if (msg.contains("brands")) {
+                        return Response.status(Response.Status.CONFLICT)
+                                .entity(new ErrorResponse("Nome da marca já cadastrado", "BRAND_NAME_EXISTS"))
+                                .build();
+                    }
+                    if (msg.contains("models")) {
+                        return Response.status(Response.Status.CONFLICT)
+                                .entity(new ErrorResponse("Nome do modelo já cadastrado", "MODEL_NAME_EXISTS"))
+                                .build();
+                    }
+                }
             }
         }
 

@@ -37,7 +37,7 @@ export class ModelForm implements OnInit {
   ngOnInit() {
     this.modelForm = this.fb.group({
       id: [null],
-      name: ['', Validators.required],
+      name: ['', [Validators.required, Validators.maxLength(100)]],
       brand: ['', Validators.required],
     });
 
@@ -94,8 +94,12 @@ export class ModelForm implements OnInit {
         this.close();
       },
       error: (err) => {
-        this.toastr.error('Erro ao atualizar modelo', 'Erro');
-        console.error(err);
+        if (err.status === 409 && err.error.code === 'MODEL_NAME_EXISTS') {
+          this.toastr.error('Nome já está sendo utilizado.', 'Erro');
+        } else {
+          this.toastr.error('Erro ao atualizar modelo', 'Erro');
+          console.error(err);
+        }
       },
     });
   }
@@ -107,8 +111,12 @@ export class ModelForm implements OnInit {
         this.close();
       },
       error: (err) => {
-        this.toastr.error('Erro ao adicionar modelo', 'Erro');
-        console.error(err);
+        if (err.status === 409 && err.error.code === 'MODEL_NAME_EXISTS') {
+          this.toastr.error('Nome já está sendo utilizado.', 'Erro');
+        } else {
+          this.toastr.error('Erro ao adicionar modelo', 'Erro');
+          console.error(err);
+        }
       },
     });
   }

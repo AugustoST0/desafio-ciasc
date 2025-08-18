@@ -5,6 +5,7 @@ import com.exemplo.services.VehicleService;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -38,7 +39,7 @@ public class VehicleResource {
 
     @POST
     @RolesAllowed("USER")
-    public Response insert(Vehicle vehicle) {
+    public Response insert(@Valid Vehicle vehicle) {
         Vehicle created = vehicleService.insert(vehicle);
         return Response.status(Response.Status.CREATED).entity(created).build();
     }
@@ -46,7 +47,7 @@ public class VehicleResource {
     @PUT
     @Path("/{id}")
     @RolesAllowed("USER")
-    public Response update(@PathParam("id") Long id, Vehicle updatedVehicle) {
+    public Response update(@PathParam("id") Long id, @Valid Vehicle updatedVehicle) {
         Vehicle vehicle = vehicleService.update(id, updatedVehicle);
 
         return Response.ok(vehicle).build();

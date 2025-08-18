@@ -46,7 +46,7 @@ public class UserResource {
     @PUT
     @Path("/{id}")
     @RolesAllowed("USER")
-    public Response update(@PathParam("id") Long id, User updatedUser) {
+    public Response update(@PathParam("id") Long id, @Valid User updatedUser) {
         UserUpdateResponseDTO user = userService.update(id, updatedUser);
         return Response.ok(user).build();
     }

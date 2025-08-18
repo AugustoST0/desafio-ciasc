@@ -46,12 +46,16 @@ export class VehicleForm implements OnInit, OnDestroy {
       id: [null],
       brand: ['', Validators.required],
       model: ['', Validators.required],
-      year: ['', [Validators.required, Validators.min(1886)]],
+      year: [
+        '',
+        [Validators.required, Validators.min(1886), Validators.max(2100)],
+      ],
       plate: [
         '',
         [
           Validators.required,
           Validators.pattern(/^[A-Z]{3}[0-9][A-Z][0-9]{2}$/),
+          Validators.maxLength(10),
         ],
       ],
       vehicleType: ['', Validators.required],
@@ -159,8 +163,12 @@ export class VehicleForm implements OnInit, OnDestroy {
         this.close();
       },
       error: (err) => {
-        this.toastr.error('Erro ao atualizar veículo', 'Erro');
-        console.error(err);
+        if (err.status === 409 && err.error.code === 'PLATE_ALREADY_EXISTS') {
+          this.toastr.error('Placa já está sendo utilizada.', 'Erro');
+        } else {
+          this.toastr.error('Erro ao atualizar veículo', 'Erro');
+          console.error(err);
+        }
       },
     });
   }
@@ -172,8 +180,12 @@ export class VehicleForm implements OnInit, OnDestroy {
         this.close();
       },
       error: (err) => {
-        this.toastr.error('Erro ao adicionar veículo', 'Erro');
-        console.error(err);
+        if (err.status === 409 && err.error.code === 'PLATE_ALREADY_EXISTS') {
+          this.toastr.error('Placa já está sendo utilizada.', 'Erro');
+        } else {
+          this.toastr.error('Erro ao adicionar veículo', 'Erro');
+          console.error(err);
+        }
       },
     });
   }

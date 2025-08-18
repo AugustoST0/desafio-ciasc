@@ -6,6 +6,7 @@ import com.exemplo.services.BrandService;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -39,7 +40,7 @@ public class BrandResource {
 
     @POST
     @RolesAllowed("ADMIN")
-    public Response insert(Brand brand) {
+    public Response insert(@Valid Brand brand) {
         Brand created = brandService.insert(brand);
         return Response.status(Response.Status.CREATED).entity(created).build();
     }
@@ -47,7 +48,7 @@ public class BrandResource {
     @PUT
     @Path("/{id}")
     @RolesAllowed("ADMIN")
-    public Response update(@PathParam("id") Long id, Brand updatedBrand) {
+    public Response update(@PathParam("id") Long id, @Valid Brand updatedBrand) {
         Brand brand = brandService.update(id, updatedBrand);
 
         return Response.ok(brand).build();

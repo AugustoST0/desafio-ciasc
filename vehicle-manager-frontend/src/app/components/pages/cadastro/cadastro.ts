@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
 import {
   Validators,
   FormBuilder,
@@ -22,16 +21,18 @@ export class Cadastro implements OnInit {
   constructor(
     private userService: UserService,
     private fb: FormBuilder,
-    private router: Router,
     private toastr: ToastrService
   ) {}
 
   ngOnInit() {
     this.registerForm = this.fb.group({
-      name: ['', [Validators.required]],
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required]],
-      confirmPassword: ['', [Validators.required]],
+      name: ['', [Validators.required, Validators.maxLength(100)]],
+      email: [
+        '',
+        [Validators.required, Validators.email, Validators.maxLength(150)],
+      ],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      confirmPassword: ['', [Validators.required, Validators.minLength(6)]],
       admin: [false],
     });
   }

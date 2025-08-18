@@ -32,7 +32,7 @@ export class BrandForm implements OnInit {
   ngOnInit() {
     this.brandForm = this.fb.group({
       id: [null],
-      name: ['', Validators.required],
+      name: ['', [Validators.required, Validators.maxLength(100)]],
     });
 
     this.brandFormService.isVisible$.subscribe((visible) => {
@@ -51,9 +51,9 @@ export class BrandForm implements OnInit {
   }
 
   onSubmit() {
-    const brand: Brand = this.brandForm.value;
+    const payload: Brand = this.brandForm.value;
 
-    if (this.isEditing && brand.id) {
+    if (this.isEditing && payload.id) {
       if (this.brandForm.pristine) {
         this.toastr.info(
           'Você deve fazer alterações',
@@ -61,31 +61,44 @@ export class BrandForm implements OnInit {
         );
         return;
       }
+      this.updateBrand(payload);
+    } else {
+      this.insertBrand(payload);
+    }
+  }
 
-      // update
-      this.brandService.update(brand.id, brand).subscribe({
-        next: () => {
-          this.toastr.success('Marca atualizada com sucesso', 'Sucesso');
-          this.close();
-        },
-        error: (err) => {
+  updateBrand(payload: Brand) {
+    this.brandService.update(payload.id, payload).subscribe({
+      next: () => {
+        this.toastr.success('Marca atualizada com sucesso', 'Sucesso');
+        this.close();
+      },
+      error: (err) => {
+        if (err.status === 409 && err.error.code === 'BRAND_NAME_EXISTS') {
+          this.toastr.error('Nome já está sendo utilizado.', 'Erro');
+        } else {
           this.toastr.error('Erro ao atualizar marca', 'Erro');
           console.error(err);
-        },
-      });
-    } else {
-      // insert
-      this.brandService.insert(brand).subscribe({
-        next: () => {
-          this.toastr.success('Marca adicionada com sucesso', 'Sucesso');
-          this.close();
-        },
-        error: (err) => {
+        }
+      },
+    });
+  }
+
+  insertBrand(payload: Brand) {
+    this.brandService.insert(payload).subscribe({
+      next: () => {
+        this.toastr.success('Marca adicionada com sucesso', 'Sucesso');
+        this.close();
+      },
+      error: (err) => {
+        if (err.status === 409 && err.error.code === 'BRAND_NAME_EXISTS') {
+          this.toastr.error('Nome já está sendo utilizado.', 'Erro');
+        } else {
           this.toastr.error('Erro ao adicionar marca', 'Erro');
           console.error(err);
-        },
-      });
-    }
+        }
+      },
+    });
   }
 
   close() {

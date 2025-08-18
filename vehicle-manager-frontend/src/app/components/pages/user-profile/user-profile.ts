@@ -88,7 +88,7 @@ export class UserProfile implements OnInit {
         if (err.status === 409 && err.error.code === 'EMAIL_ALREADY_EXISTS') {
           this.toastr.error('E-mail já está sendo utilizado.', 'Erro');
         } else {
-          this.toastr.error('Erro inesperado.', 'Erro');
+          this.toastr.error('Erro ao atualizar usuário.', 'Erro');
         }
       },
     });
