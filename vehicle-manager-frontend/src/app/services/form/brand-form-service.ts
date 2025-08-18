@@ -8,13 +8,9 @@ import { Brand } from '../../interfaces/Brand';
 export class BrandFormService {
   private isVisibleSubject = new BehaviorSubject<boolean>(false);
   private brandDataSubject = new BehaviorSubject<Brand | null>(null);
-  private brandInsertedSubject = new Subject<Brand>();
-  private brandUpdatedSubject = new Subject<Brand>();
 
   isVisible$ = this.isVisibleSubject.asObservable();
   brandData$ = this.brandDataSubject.asObservable();
-  brandInserted$ = this.brandInsertedSubject.asObservable();
-  brandUpdated$ = this.brandUpdatedSubject.asObservable();
 
   open(brand?: Brand) {
     if (brand) {

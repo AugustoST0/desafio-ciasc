@@ -8,13 +8,9 @@ import { Model } from '../../interfaces/Model';
 export class ModelFormService {
   private isVisibleSubject = new BehaviorSubject<boolean>(false);
   private modelDataSubject = new BehaviorSubject<Model | null>(null);
-  private modelInsertedSubject = new Subject<Model>();
-  private modelUpdatedSubject = new Subject<Model>();
 
   isVisible$ = this.isVisibleSubject.asObservable();
   modelData$ = this.modelDataSubject.asObservable();
-  modelInserted$ = this.modelInsertedSubject.asObservable();
-  modelUpdated$ = this.modelUpdatedSubject.asObservable();
 
   open(model?: Model) {
     if (model) {

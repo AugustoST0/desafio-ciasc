@@ -25,7 +25,7 @@ public class JWTTokenProvider {
         Set<String> groups = new HashSet<>();
         groups.add("USER");
 
-        if(user.isAdmin()) {
+        if (user.isAdmin()) {
             groups.add("ADMIN");
         }
 

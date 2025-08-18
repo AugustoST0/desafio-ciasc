@@ -26,7 +26,6 @@ export class VehicleForm implements OnInit, OnDestroy {
   vehicleForm!: FormGroup;
   isVisible = false;
   isEditing = false;
-  private currentId: number | null = null;
   private subs: Subscription[] = [];
 
   brands: Brand[] = [];
@@ -65,20 +64,18 @@ export class VehicleForm implements OnInit, OnDestroy {
         if (vehicle) {
           this.vehicleForm.patchValue({
             id: vehicle.id,
-            brand: vehicle.brand.name,
-            model: vehicle.model.name,
+            brand: vehicle.model.brand.id,
+            model: vehicle.model.id,
             year: vehicle.year,
             plate: vehicle.plate,
             vehicleType: vehicle.vehicleType,
           });
           this.isEditing = true;
-          this.currentId = vehicle.id!;
-          this.updateFilteredModels(vehicle.brand.name);
+          this.updateFilteredModels(vehicle.model.brand.id);
         } else {
           this.vehicleForm.reset();
           this.isEditing = false;
-          this.currentId = null;
-          this.filteredModels = this.models.slice();
+          this.updateFilteredModels();
         }
       })
     );
@@ -90,58 +87,58 @@ export class VehicleForm implements OnInit, OnDestroy {
       }),
       this.modelService.models$.subscribe((models) => {
         this.models = models;
-        this.filteredModels = models.slice();
+        this.updateFilteredModels();
       })
     );
 
     // Carregamento inicial
-    this.brandService
-      .getAll()
-      .subscribe({ error: (err) => console.error(err) });
-    this.modelService
-      .getAll()
-      .subscribe({ error: (err) => console.error(err) });
+    this.brandService.getAll().subscribe();
+    this.modelService.getAll().subscribe();
 
     // Lógica de dependência entre marca e modelo
     this.subs.push(
       // usuário muda marca, modelos são limitados
-      this.vehicleForm.get('brand')!.valueChanges.subscribe((brandName) => {
-        this.updateFilteredModels(brandName);
+      this.vehicleForm.get('brand')!.valueChanges.subscribe((brandId) => {
+        this.updateFilteredModels(brandId);
 
-        // Se o modelo selecionado não pertence à marca, limpa o campo modelo
-        const selectedModelName = this.vehicleForm.get('model')!.value;
+        const selectedModelId = this.vehicleForm.get('model')!.value;
         if (
-          selectedModelName &&
-          !this.filteredModels.some((m) => m.name === selectedModelName)
+          selectedModelId &&
+          !this.filteredModels.some((m) => m.id === selectedModelId)
         ) {
           this.vehicleForm.get('model')!.setValue('');
         }
       }),
       // usuário muda modelo, marca é preenchida automaticamente
-      this.vehicleForm.get('model')!.valueChanges.subscribe((modelName) => {
-        const model = this.models.find((m) => m.name === modelName);
+      this.vehicleForm.get('model')!.valueChanges.subscribe((modelId) => {
+        const model = this.models.find((m) => m.id === +modelId);
         if (model) {
-          this.vehicleForm.get('brand')!.setValue(model.brand.name, {
-            emitEvent: false, // evita loop infinito
+          this.vehicleForm.get('brand')!.setValue(model.brand.id, {
+            emitEvent: false,
           });
-          this.updateFilteredModels(model.brand.name);
+          this.updateFilteredModels(model.brand.id);
         }
       })
     );
   }
 
-  private updateFilteredModels(brandName: string) {
-    if (!brandName) {
-      this.filteredModels = this.models.slice();
+  private updateFilteredModels(brandId?: number) {
+    if (brandId) {
+      this.filteredModels = this.models.filter((m) => m.brand.id === +brandId);
     } else {
-      this.filteredModels = this.models.filter(
-        (m) => m.brand.name === brandName
-      );
+      this.filteredModels = this.models.slice();
     }
   }
 
   onSubmit() {
-    if (this.isEditing && this.currentId) {
+    const payload: Vehicle = {
+      model: this.models.find((m) => m.id === +this.vehicleForm.value.model)!,
+      year: this.vehicleForm.value.year,
+      plate: this.vehicleForm.value.plate,
+      vehicleType: this.vehicleForm.value.vehicleType,
+    };
+
+    if (this.isEditing && this.vehicleForm.value.id) {
       if (this.vehicleForm.pristine) {
         this.toastr.info(
           'Você deve fazer alterações',
@@ -149,49 +146,29 @@ export class VehicleForm implements OnInit, OnDestroy {
         );
         return;
       }
-      this.updateVehicle();
+      this.updateVehicle(payload);
     } else {
-      this.insertVehicle();
+      this.insertVehicle(payload);
     }
   }
 
-  updateVehicle() {
-    const payload: Vehicle = {
-      brand: this.brands.find((b) => b.name === this.vehicleForm.value.brand)!,
-      model: this.models.find((m) => m.name === this.vehicleForm.value.model)!,
-      year: this.vehicleForm.value.year,
-      plate: this.vehicleForm.value.plate,
-      vehicleType: this.vehicleForm.value.vehicleType,
-    };
-
-    this.vehicleService
-      .update(this.vehicleForm.value.id, payload)
-      .subscribe({
-        next: (updatedVehicle) => {
-          this.toastr.success('Veículo atualizado com sucesso', 'Sucesso');
-          this.vehicleFormService.notifyVehicleSaved(updatedVehicle, true);
-          this.close();
-        },
-        error: (err) => {
-          this.toastr.error('Erro ao atualizar veículo', 'Erro');
-          console.error(err);
-        },
-      });
+  updateVehicle(payload: Vehicle) {
+    this.vehicleService.update(this.vehicleForm.value.id, payload).subscribe({
+      next: () => {
+        this.toastr.success('Veículo atualizado com sucesso', 'Sucesso');
+        this.close();
+      },
+      error: (err) => {
+        this.toastr.error('Erro ao atualizar veículo', 'Erro');
+        console.error(err);
+      },
+    });
   }
 
-  insertVehicle() {
-    const payload: Vehicle = {
-      brand: this.brands.find((b) => b.name === this.vehicleForm.value.brand)!,
-      model: this.models.find((m) => m.name === this.vehicleForm.value.model)!,
-      year: this.vehicleForm.value.year,
-      plate: this.vehicleForm.value.plate,
-      vehicleType: this.vehicleForm.value.vehicleType,
-    };
-
+  insertVehicle(payload: Vehicle) {
     this.vehicleService.insert(payload).subscribe({
-      next: (newVehicle) => {
+      next: () => {
         this.toastr.success('Veículo adicionado com sucesso', 'Sucesso');
-        this.vehicleFormService.notifyVehicleSaved(newVehicle, false);
         this.close();
       },
       error: (err) => {

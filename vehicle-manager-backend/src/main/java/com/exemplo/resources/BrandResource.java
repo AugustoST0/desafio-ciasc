@@ -38,7 +38,7 @@ public class BrandResource {
     }
 
     @POST
-    @RolesAllowed("USER")
+    @RolesAllowed("ADMIN")
     public Response insert(Brand brand) {
         Brand created = brandService.insert(brand);
         return Response.status(Response.Status.CREATED).entity(created).build();
@@ -46,7 +46,7 @@ public class BrandResource {
 
     @PUT
     @Path("/{id}")
-    @RolesAllowed("USER")
+    @RolesAllowed("ADMIN")
     public Response update(@PathParam("id") Long id, Brand updatedBrand) {
         Brand brand = brandService.update(id, updatedBrand);
 
@@ -55,7 +55,7 @@ public class BrandResource {
 
     @DELETE
     @Path("/{id}")
-    @RolesAllowed("USER")
+    @RolesAllowed("ADMIN")
     public Response delete(@PathParam("id") Long id) {
         brandService.delete(id);
         return Response.noContent().build();

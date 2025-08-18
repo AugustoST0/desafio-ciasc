@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
-import { UserService } from '../../../services/api/user-service';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../services/api/auth-service';
 import { User } from '../../../interfaces/User';

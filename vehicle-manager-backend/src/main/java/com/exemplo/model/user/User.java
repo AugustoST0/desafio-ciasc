@@ -32,6 +32,5 @@ public class User {
     @NotBlank(message = "Password is mandatory")
     private String password;
 
-    @Column(nullable = true)
     private boolean isAdmin;
 }

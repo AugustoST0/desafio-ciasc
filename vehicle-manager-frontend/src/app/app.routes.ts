@@ -6,19 +6,29 @@ import { Dashboard } from './components/pages/dashboard/dashboard';
 import { VehiclePage } from './components/pages/vehicle-page/vehicle-page';
 import { UserProfile } from './components/pages/user-profile/user-profile';
 import { BrandModelPage } from './components/pages/brand-model-page/brand-model-page';
+import { AuthGuard } from './services/guards/auth-guard';
+import { AdminGuard } from './services/guards/admin-guard';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
-  { path: 'register', component: Cadastro },
   {
     path: '',
     component: Layout,
+    canActivate: [AuthGuard],
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', component: Dashboard },
       { path: 'vehicle-page', component: VehiclePage },
       { path: 'profile', component: UserProfile },
-      { path: 'brand-model-page', component: BrandModelPage },
+      {
+        path: 'admin',
+        canActivate: [AdminGuard],
+        children: [
+          { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
+          { path: 'brand-model-page', component: BrandModelPage },
+          { path: 'register', component: Cadastro },
+        ],
+      },
     ],
   },
 ];

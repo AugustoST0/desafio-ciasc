@@ -32,7 +32,6 @@ public class VehicleService {
     @Transactional
     public Vehicle update(Long id, Vehicle updatedVehicle) {
         Vehicle vehicle = getById(id);
-        vehicle.setBrand(updatedVehicle.getBrand());
         vehicle.setModel(updatedVehicle.getModel());
         vehicle.setYear(updatedVehicle.getYear());
         vehicle.setPlate(updatedVehicle.getPlate());

@@ -21,10 +21,6 @@ public class Vehicle {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "brand_id")
-    @NotNull
-    private Brand brand;
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "model_id")
     @NotNull
     private Modelo model;

@@ -70,14 +70,14 @@ export class UserProfile implements OnInit {
       name: this.profileForm.get('name')?.value || this.user!.name,
       email: this.profileForm.get('email')?.value || this.user!.email,
       password: password || null,
+      admin: this.user!.admin
     };
 
-    console.log(updatedUser);
-
     this.userService.update(this.user!.id!, updatedUser).subscribe({
-      next: (user) => {
-        this.user = user;
-        this.authService.tryRefreshOrLogout();
+      next: (response) => {
+        this.user = response.user;
+        this.authService.setTokens(response.accessToken, response.refreshToken);
+        this.authService.loadUserFromToken();
         this.profileForm.get('password')?.reset();
         this.profileForm.get('confirmPassword')?.reset();
         this.profileForm.markAsPristine();

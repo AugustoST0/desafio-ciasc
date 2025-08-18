@@ -1,6 +1,10 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
   <div class="container-fluid">
-    <a class="navbar-brand" href="#">Vehicle Manager</a>
+    <a class="navbar-brand" href="#">
+      Vehicle Manager @if(user?.admin) {
+      <small class="ms-2 fst-italic">Administrador</small>
+      }</a
+    >
     <button
       class="navbar-toggler"
       type="button"
@@ -20,8 +24,20 @@
           <a class="nav-link" routerLink="/dashboard">Dashboard</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" routerLink="/vehicle-page">Cadastro de Veículo</a>
+          <a class="nav-link" routerLink="/vehicle-page">Veículos</a>
         </li>
+        @if (user?.admin) {
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/admin/brand-model-page"
+            >Marcas & Modelos</a
+          >
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/admin/register"
+            >Cadastro de usuário</a
+          >
+        </li>
+        }
 
         <!-- Dropdown (telas grandes) -->
         <li class="nav-item dropdown d-none d-lg-flex">

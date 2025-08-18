@@ -38,7 +38,7 @@ export class ModelForm implements OnInit {
     this.modelForm = this.fb.group({
       id: [null],
       name: ['', Validators.required],
-      brand: [null, Validators.required],
+      brand: ['', Validators.required],
     });
 
     this.modelFormService.isVisible$.subscribe((visible) => {
@@ -63,27 +63,17 @@ export class ModelForm implements OnInit {
       this.brands = brands;
     });
 
-    this.brandService.getAll().subscribe({
-      error: (err) => {
-        this.toastr.error('Erro ao resgatar dados', 'Erro');
-        console.error(err);
-      },
-    });
+    this.brandService.getAll().subscribe();
   }
 
   onSubmit() {
-    const selectedBrandId = Number(this.modelForm.value.brand);
-    const selectedBrand = this.brands.find((b) => b.id === selectedBrandId)!;
-
-    const model: Model = {
+    const payload: Model = {
       id: this.modelForm.value.id,
       name: this.modelForm.value.name,
-      brand: selectedBrand,
+      brand: this.brands.find((b) => b.id === +this.modelForm.value.brand)!,
     };
 
-    console.log(model);
-
-    if (this.isEditing && model.id) {
+    if (this.isEditing && payload.id) {
       if (this.modelForm.pristine) {
         this.toastr.info(
           'Você deve fazer alterações',
@@ -91,31 +81,36 @@ export class ModelForm implements OnInit {
         );
         return;
       }
-
-      // update
-      this.modelService.update(model.id, model).subscribe({
-        next: () => {
-          this.toastr.success('Modelo atualizado com sucesso', 'Sucesso');
-          this.close();
-        },
-        error: (err) => {
-          this.toastr.error('Erro ao atualizar modelo', 'Erro');
-          console.error(err);
-        },
-      });
+      this.updateModel(payload);
     } else {
-      // insert
-      this.modelService.insert(model).subscribe({
-        next: () => {
-          this.toastr.success('Modelo adicionado com sucesso', 'Sucesso');
-          this.close();
-        },
-        error: (err) => {
-          this.toastr.error('Erro ao adicionar modelo', 'Erro');
-          console.error(err);
-        },
-      });
+      this.insertModel(payload);
     }
+  }
+
+  updateModel(payload: Model) {
+    this.modelService.update(payload.id, payload).subscribe({
+      next: () => {
+        this.toastr.success('Modelo atualizado com sucesso', 'Sucesso');
+        this.close();
+      },
+      error: (err) => {
+        this.toastr.error('Erro ao atualizar modelo', 'Erro');
+        console.error(err);
+      },
+    });
+  }
+
+  insertModel(payload: Model) {
+    this.modelService.insert(payload).subscribe({
+      next: () => {
+        this.toastr.success('Modelo adicionado com sucesso', 'Sucesso');
+        this.close();
+      },
+      error: (err) => {
+        this.toastr.error('Erro ao adicionar modelo', 'Erro');
+        console.error(err);
+      },
+    });
   }
 
   close() {

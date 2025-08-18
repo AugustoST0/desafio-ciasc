@@ -12,8 +12,8 @@
           <label class="form-label">Marca</label>
           <select class="form-select" formControlName="brand">
             <option value="" disabled>Selecione a marca</option>
-            @for (b of brands; track b.id) {
-            <option [value]="b.name">{{ b.name }}</option>
+            @for (brand of brands; track brand.id) {
+            <option [value]="brand.id">{{ brand.name }}</option>
             }
           </select>
         </div>
@@ -21,8 +21,8 @@
           <label class="form-label">Modelo</label>
           <select class="form-select" formControlName="model">
             <option value="" disabled>Selecione o modelo</option>
-            @for (m of filteredModels; track m.id) {
-            <option [value]="m.name">{{ m.name }}</option>
+            @for (model of filteredModels; track model.id) {
+            <option [value]="model.id">{{ model.name }}</option>
             }
           </select>
         </div>

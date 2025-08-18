@@ -1,6 +1,7 @@
 package com.exemplo.resources;
 
 import com.exemplo.model.user.User;
+import com.exemplo.model.user.UserUpdateResponseDTO;
 import com.exemplo.services.UserService;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -36,6 +37,7 @@ public class UserResource {
 
     @POST
     @Path("/register")
+    @RolesAllowed("ADMIN")
     public Response register(@Valid User user) {
         User createdUser = userService.register(user);
         return Response.status(Response.Status.CREATED).entity(createdUser).build();
@@ -45,7 +47,7 @@ public class UserResource {
     @Path("/{id}")
     @RolesAllowed("USER")
     public Response update(@PathParam("id") Long id, User updatedUser) {
-        User user = userService.update(id, updatedUser);
+        UserUpdateResponseDTO user = userService.update(id, updatedUser);
         return Response.ok(user).build();
     }
 

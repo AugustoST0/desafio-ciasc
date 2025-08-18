@@ -11,12 +11,25 @@ public class PersistenceExceptionMapper implements ExceptionMapper<PersistenceEx
 
     @Override
     public Response toResponse(PersistenceException e) {
-        if (e instanceof ConstraintViolationException &&
-                e.getMessage().toLowerCase().contains("duplicate entry") &&
-                e.getMessage().toLowerCase().contains("email")) {
-            return Response.status(Response.Status.CONFLICT)
-                    .entity(new ErrorResponse("E-mail já cadastrado", "EMAIL_ALREADY_EXISTS"))
-                    .build();
+
+        if (e instanceof ConstraintViolationException cve) {
+            String msg = cve.getMessage().toLowerCase();
+
+            // Caso de e-mail duplicado
+            if (msg.contains("duplicate entry") && msg.contains("email")) {
+                return Response.status(Response.Status.CONFLICT)
+                        .entity(new ErrorResponse("E-mail já cadastrado", "EMAIL_ALREADY_EXISTS"))
+                        .build();
+            }
+
+            if (msg.contains("cannot delete") || msg.contains("foreign key constraint fails")) {
+                return Response.status(Response.Status.CONFLICT)
+                        .entity(new ErrorResponse(
+                                "Não é possível deletar este registro porque existem registros associados a ele",
+                                "ASSOCIATED_RECORDS_EXIST"
+                        ))
+                        .build();
+            }
         }
 
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR)

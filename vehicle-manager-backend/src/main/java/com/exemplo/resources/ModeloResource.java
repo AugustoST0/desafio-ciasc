@@ -37,7 +37,7 @@ public class ModeloResource {
     }
 
     @POST
-    @RolesAllowed("USER")
+    @RolesAllowed("ADMIN")
     public Response insert(Modelo modelo) {
         Modelo created = modeloService.insert(modelo);
         return Response.status(Response.Status.CREATED).entity(created).build();
@@ -45,7 +45,7 @@ public class ModeloResource {
 
     @PUT
     @Path("/{id}")
-    @RolesAllowed("USER")
+    @RolesAllowed("ADMIN")
     public Response update(@PathParam("id") Long id, Modelo updatedModelo) {
         Modelo modelo = modeloService.update(id, updatedModelo);
 
@@ -54,7 +54,7 @@ public class ModeloResource {
 
     @DELETE
     @Path("/{id}")
-    @RolesAllowed("USER")
+    @RolesAllowed("ADMIN")
     public Response delete(@PathParam("id") Long id) {
         modeloService.delete(id);
         return Response.noContent().build();

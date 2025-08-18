@@ -3,7 +3,9 @@ package com.exemplo.services;
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import com.exemplo.exception.exceptions.RegisterNotFoundException;
 import com.exemplo.model.user.User;
+import com.exemplo.model.user.UserUpdateResponseDTO;
 import com.exemplo.repositories.UserRepository;
+import com.exemplo.security.JWTTokenProvider;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -15,6 +17,9 @@ public class UserService {
 
     @Inject
     UserRepository userRepository;
+
+    @Inject
+    JWTTokenProvider jwtTokenProvider;
 
     public List<User> getAll() {
         return userRepository.listAll();
@@ -50,7 +55,7 @@ public class UserService {
     }
 
     @Transactional
-    public User update(Long id, User updatedUser) {
+    public UserUpdateResponseDTO update(Long id, User updatedUser) {
         User user = getById(id);
 
         if (updatedUser.getName() != null) {
@@ -67,7 +72,11 @@ public class UserService {
             user.setPassword(hashedPassword);
         }
 
-        return userRepository.save(user);
+        String accessToken = jwtTokenProvider.generateAccessToken(user.getEmail());
+        String refreshToken = jwtTokenProvider.generateRefreshToken(user.getEmail());
+
+        userRepository.save(user);
+        return new UserUpdateResponseDTO(user, accessToken, refreshToken);
     }
 
     @Transactional

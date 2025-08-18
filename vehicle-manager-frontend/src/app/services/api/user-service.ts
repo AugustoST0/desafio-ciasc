@@ -5,6 +5,7 @@ import { Injectable } from '@angular/core';
 import { User } from '../../interfaces/User';
 
 import { environment } from '../../environments/environment';
+import { UserUpdateResponseDTO } from '../../interfaces/UserUpdateResponseDTO';
 
 @Injectable({
   providedIn: 'root',
@@ -27,8 +28,8 @@ export class UserService {
     return this.http.post<User>(`${this.apiUrl}/register`, user);
   }
 
-  update(id: number, user: User): Observable<User> {
-    return this.http.put<User>(`${this.apiUrl}/${id}`, user);
+  update(id: number, user: User): Observable<UserUpdateResponseDTO> {
+    return this.http.put<UserUpdateResponseDTO>(`${this.apiUrl}/${id}`, user);
   }
 
   delete(id: number): Observable<void> {

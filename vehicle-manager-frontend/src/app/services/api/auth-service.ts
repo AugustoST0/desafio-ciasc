@@ -32,7 +32,7 @@ export class AuthService {
     this.loadUserFromToken();
   }
 
-  private loadUserFromToken() {
+  loadUserFromToken() {
     const token = localStorage.getItem('accessToken');
     if (!token) return;
 
@@ -41,9 +41,15 @@ export class AuthService {
       id: decoded.userId,
       name: decoded.userName,
       email: decoded.sub,
+      admin: decoded.groups.includes('ADMIN'),
     };
 
     this.currentUserSubject.next(user);
+  }
+
+  setTokens(accessToken: string, refreshToken: string) {
+    localStorage.setItem('accessToken', accessToken);
+    localStorage.setItem('refreshToken', refreshToken);
   }
 
   login(credencials: {
@@ -54,8 +60,7 @@ export class AuthService {
       .post<TokenResponseDTO>(`${this.apiUrl}/login`, credencials)
       .pipe(
         tap((tokens: TokenResponseDTO) => {
-          localStorage.setItem('accessToken', tokens.accessToken);
-          localStorage.setItem('refreshToken', tokens.refreshToken);
+          this.setTokens(tokens.accessToken, tokens.refreshToken);
           this.loadUserFromToken();
           this.startTokenRefreshTimer();
         })
@@ -68,8 +73,7 @@ export class AuthService {
       .post<TokenResponseDTO>(`${this.apiUrl}/refresh`, { refreshToken })
       .pipe(
         tap((tokens: TokenResponseDTO) => {
-          localStorage.setItem('accessToken', tokens.accessToken);
-          localStorage.setItem('refreshToken', tokens.refreshToken);
+          this.setTokens(tokens.accessToken, tokens.refreshToken);
           this.startTokenRefreshTimer();
         })
       );

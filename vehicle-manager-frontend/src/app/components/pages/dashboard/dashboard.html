@@ -1,1 +1,39 @@
-<p>dashboard works!</p>
+<div class="container mt-4">
+  <div class="d-flex justify-content-center align-items-center mb-4 w-100">
+    <h2>Dashboard</h2>
+  </div>
+  <div class="row text-center">
+    <div class="col-12 col-md-4 mb-3">
+      <div class="card h-100 border">
+        <div
+          class="card-body d-flex flex-column justify-content-center align-items-center"
+        >
+          <h5 class="card-title">Veículos</h5>
+          <p class="display-4 mb-0">{{ vehicles.length }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-4 mb-3">
+      <div class="card h-100 border">
+        <div
+          class="card-body d-flex flex-column justify-content-center align-items-center"
+        >
+          <h5 class="card-title">Marcas</h5>
+          <p class="display-4 mb-0">{{ brands.length }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-4 mb-3">
+      <div class="card h-100 border">
+        <div
+          class="card-body d-flex flex-column justify-content-center align-items-center"
+        >
+          <h5 class="card-title">Modelos</h5>
+          <p class="display-4 mb-0">{{ models.length }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

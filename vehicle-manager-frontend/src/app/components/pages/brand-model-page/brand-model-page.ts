@@ -30,38 +30,10 @@ export class BrandModelPage implements OnInit {
 
   ngOnInit() {
     this.brandService.brands$.subscribe((brands) => (this.brands = brands));
-    this.brandService.getAll().subscribe({
-      error: (err) => {
-        this.toastr.error('Erro ao resgatar dados', 'Erro');
-        console.error(err);
-      },
-    });
-    
+    this.brandService.getAll().subscribe();
+
     this.modelService.models$.subscribe((models) => (this.models = models));
-    this.modelService.getAll().subscribe({
-      error: (err) => {
-        this.toastr.error('Erro ao resgatar dados', 'Erro');
-        console.error(err);
-      },
-    });
-
-    this.brandFormService.brandInserted$.subscribe((brand: Brand) => {
-      this.brands.push(brand);
-    });
-
-    this.brandFormService.brandUpdated$.subscribe((brand: Brand) => {
-      const index = this.brands.findIndex((b) => b.id === brand.id);
-      if (index !== -1) this.brands[index] = brand;
-    });
-
-    this.modelFormService.modelInserted$.subscribe((model: Model) => {
-      this.models.push(model);
-    });
-
-    this.modelFormService.modelUpdated$.subscribe((model: Model) => {
-      const index = this.models.findIndex((m) => m.id === model.id);
-      if (index !== -1) this.models[index] = model;
-    });
+    this.modelService.getAll().subscribe();
   }
 
   openBrandForm(brand?: Brand) {
@@ -89,12 +61,18 @@ export class BrandModelPage implements OnInit {
   deleteBrand(id: number) {
     this.brandService.delete(id).subscribe({
       next: () => {
-        this.brands = this.brands.filter((b) => b.id !== id);
         this.toastr.success('Marca deletada com sucesso', 'Sucesso');
       },
       error: (err) => {
-        this.toastr.error('Erro ao deletar marca', 'Erro');
-        console.error(err);
+        if (
+          err.status === 409 &&
+          err.error.code === 'ASSOCIATED_RECORDS_EXIST'
+        ) {
+          this.toastr.error('Marca possui modelos associados.', 'Erro');
+        } else {
+          this.toastr.error('Erro ao deletar marca', 'Erro');
+          console.error(err);
+        }
       },
     });
   }
@@ -116,12 +94,18 @@ export class BrandModelPage implements OnInit {
   deleteModel(id: number) {
     this.modelService.delete(id).subscribe({
       next: () => {
-        this.models = this.models.filter((m) => m.id !== id);
         this.toastr.success('Modelo deletado com sucesso', 'Sucesso');
       },
       error: (err) => {
-        this.toastr.error('Erro ao deletar modelo', 'Erro');
-        console.error(err);
+        if (
+          err.status === 409 &&
+          err.error.code === 'ASSOCIATED_RECORDS_EXIST'
+        ) {
+          this.toastr.error('Modelo possui veículos associados.', 'Erro');
+        } else {
+          this.toastr.error('Erro ao deletar modelo', 'Erro');
+          console.error(err);
+        }
       },
     });
   }

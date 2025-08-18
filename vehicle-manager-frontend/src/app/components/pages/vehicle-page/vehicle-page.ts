@@ -23,33 +23,13 @@ export class VehiclePage implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.vehicleService.getAll().subscribe({
-      next: (vehicles: Vehicle[]) => {
-        this.vehicles = vehicles;
-      },
-      error: (err) => {
-        this.toastr.error('Erro ao resgatar itens', 'Erro');
-        console.error(err);
-      },
-    });
-
-    this.vehicleFormService.vehicleInserted$.subscribe((vehicle: Vehicle) => {
-      this.vehicles.push(vehicle);
-    });
-
-    this.vehicleFormService.vehicleUpdated$.subscribe((vehicle: Vehicle) => {
-      const index = this.vehicles.findIndex((v) => v.id === vehicle.id);
-      if (index !== -1) {
-        this.vehicles[index] = vehicle;
-      }
-    });
+    this.vehicleService.vehicles$.subscribe(
+      (vehicles) => (this.vehicles = vehicles)
+    );
+    this.vehicleService.getAll().subscribe();
   }
 
-  openFormToCreate() {
-    this.vehicleFormService.open();
-  }
-
-  openFormToEdit(vehicle: Vehicle) {
+  openForm(vehicle?: Vehicle) {
     this.vehicleFormService.open(vehicle);
   }
 
@@ -73,7 +53,6 @@ export class VehiclePage implements OnInit {
   deleteVehicle(id: number) {
     this.vehicleService.delete(id).subscribe({
       next: () => {
-        this.vehicles = this.vehicles.filter((v) => v.id !== id);
         this.toastr.success('O veículo foi deletado com sucesso', 'Sucesso');
       },
       error: (err) => {
