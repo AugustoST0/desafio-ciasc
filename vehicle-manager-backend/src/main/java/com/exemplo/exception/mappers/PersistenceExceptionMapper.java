@@ -6,6 +6,8 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
 
+import java.sql.SQLIntegrityConstraintViolationException;
+
 @Provider
 public class PersistenceExceptionMapper implements ExceptionMapper<PersistenceException> {
 
@@ -35,6 +37,28 @@ public class PersistenceExceptionMapper implements ExceptionMapper<PersistenceEx
                     if (msg.contains("models")) {
                         return Response.status(Response.Status.CONFLICT)
                                 .entity(new ErrorResponse("Nome do modelo já cadastrado", "MODEL_NAME_EXISTS"))
+                                .build();
+                    }
+                }
+            }
+
+            Throwable cause = cve.getCause();
+            if (cause instanceof SQLIntegrityConstraintViolationException sqlViolation) {
+                String causeMsg = sqlViolation.getMessage().toLowerCase();
+
+                if (causeMsg.contains("cannot delete") || causeMsg.contains("foreign key")) {
+                    if (causeMsg.contains("brands")) {
+                        return Response.status(Response.Status.CONFLICT)
+                                .entity(new ErrorResponse(
+                                        "Não é possível deletar a marca, existem modelos associados",
+                                        "BRAND_HAS_MODELS"))
+                                .build();
+                    }
+                    if (causeMsg.contains("models")) {
+                        return Response.status(Response.Status.CONFLICT)
+                                .entity(new ErrorResponse(
+                                        "Não é possível deletar o modelo, existem veículos associados",
+                                        "MODEL_HAS_VEHICLES"))
                                 .build();
                     }
                 }

@@ -43,7 +43,7 @@ export class Login implements OnInit {
       });
   }
 
-  submit() {
+  onSubmit() {
     if (this.loginForm.invalid) {
       this.toastr.error('Preencha todos os campos corretamente.', 'Erro');
       this.loginForm.markAllAsTouched();

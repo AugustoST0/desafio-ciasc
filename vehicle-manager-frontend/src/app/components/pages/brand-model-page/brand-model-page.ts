@@ -64,10 +64,7 @@ export class BrandModelPage implements OnInit {
         this.toastr.success('Marca deletada com sucesso', 'Sucesso');
       },
       error: (err) => {
-        if (
-          err.status === 409 &&
-          err.error.code === 'ASSOCIATED_RECORDS_EXIST'
-        ) {
+        if (err.status === 409 && err.error.code === 'BRAND_HAS_MODELS') {
           this.toastr.error('Marca possui modelos associados.', 'Erro');
         } else {
           this.toastr.error('Erro ao deletar marca', 'Erro');
@@ -97,10 +94,7 @@ export class BrandModelPage implements OnInit {
         this.toastr.success('Modelo deletado com sucesso', 'Sucesso');
       },
       error: (err) => {
-        if (
-          err.status === 409 &&
-          err.error.code === 'ASSOCIATED_RECORDS_EXIST'
-        ) {
+        if (err.status === 409 && err.error.code === 'MODEL_HAS_VEHICLES') {
           this.toastr.error('Modelo possui veículos associados.', 'Erro');
         } else {
           this.toastr.error('Erro ao deletar modelo', 'Erro');

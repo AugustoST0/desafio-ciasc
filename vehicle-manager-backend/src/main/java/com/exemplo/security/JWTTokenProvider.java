@@ -34,7 +34,7 @@ public class JWTTokenProvider {
                 .claim("userId", user.getId())
                 .claim("userName", user.getName())
                 .groups(groups)
-                .expiresIn(Duration.ofMinutes(60))
+                .expiresIn(Duration.ofMinutes(15))
                 .sign();
     }
 

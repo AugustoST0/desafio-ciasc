@@ -54,6 +54,8 @@ services:
       args:
         NGINX_PUBLIC_PATH: /
     container_name: vehicle-manager-frontend
+    depends_on:
+      - backend
     ports:
       - "80:80"
     restart: unless-stopped

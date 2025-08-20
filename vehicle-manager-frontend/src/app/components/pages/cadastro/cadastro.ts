@@ -59,8 +59,6 @@ export class Cadastro implements OnInit {
       admin: this.registerForm.get('admin')?.value,
     };
 
-    console.log(payload);
-
     this.userService.register(payload).subscribe({
       next: () => {
         this.toastr.success('Usuário cadastrado com sucesso.', 'Sucesso');
