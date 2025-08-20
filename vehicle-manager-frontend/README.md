@@ -1,59 +1,54 @@
-# VehicleManagerFrontend
+# Vehicle Manager — Frontend (Angular 20)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.1.0.
+Frontend em **Angular 20**. Por padrão, ele chama a API em `http://localhost:8080/api/v1`.
 
-## Development server
+> **Pastas**: `vehicle-manager/vehicle-manager/vehicle-manager-frontend`
 
-To start a local development server, run:
+## Requisitos
 
-```bash
-ng serve
-```
+- **Node.js 20 LTS** (sugestão: use nvm)
+- **npm** 10+
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Instalação
 
 ```bash
-ng generate component component-name
+cd vehicle-manager/vehicle-manager/vehicle-manager-frontend
+npm ci    # ou: npm install
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+### Configurar URL da API (se necessário)
+
+Por padrão o projeto usa:
+`src/app/environments/environment.ts`
+
+```ts
+export const environment = {
+  production: false,
+  baseApiUrl: "http://localhost:8080/api/v1",
+};
+```
+
+Altere `baseApiUrl` caso rode o backend em outro host/porta.
+
+## Executar em desenvolvimento
 
 ```bash
-ng generate --help
+npm start    # atalho para: ng serve
+# abre em http://localhost:4200
 ```
 
-## Building
+> Como o backend permite CORS `*`, não é necessário proxy no `ng serve`.  
+> Se preferir proxy reverso, crie um `proxy.conf.json` e adicione o `--proxy-config` no script `start`.
 
-To build the project run:
+## Build de produção
 
 ```bash
-ng build
+npm run build
+# artefatos em dist/
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+## Testes (frontend)
 
 ```bash
-ng test
+npm test    # ng test
 ```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.

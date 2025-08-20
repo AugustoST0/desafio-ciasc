@@ -1,87 +1,155 @@
-# vehicle-manager-backend
+# Vehicle Manager — Backend (Quarkus)
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
+API RESTful construída com **Quarkus 3.25.3** (Java **21**), Hibernate ORM com Panache e JWT.
 
-If you want to learn more about Quarkus, please visit its website: <https://quarkus.io/>.
+> **Pastas**: `/mnt/data/vehicle-manager/vehicle-manager/vehicle-manager-backend`
 
-## Running the application in dev mode
+## Requisitos
 
-You can run your application in dev mode that enables live coding using:
+- **Java 21** (JDK 21) — verifique com: `java -version`
+- **Maven** (o projeto inclui `./mvnw`, então não precisa instalar Maven globalmente)
+- **MySQL 8.0+**
 
-```shell script
+## Configuração do Banco de Dados (MySQL)
+
+O backend está configurado por padrão para conectar em:
+```
+URL:  jdbc:mysql://localhost:3306/vehicle_manager
+User: admin
+Pass: 12345678
+```
+(veja `src/main/resources/application.properties` — `quarkus.datasource.*`)
+
+O Hibernate está com **`quarkus.hibernate-orm.database.generation=update`**, então as tabelas serão criadas/atualizadas automaticamente.
+
+### Opção A — Docker Compose (recomendado para desenvolvimento)
+
+Crie um arquivo `docker-compose.mysql.yml` com o conteúdo:
+
+```yaml
+version: "3.9"
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: vm_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: vehicle_manager
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: 12345678
+    ports:
+      - "3306:3306"
+    command: ["--default-authentication-plugin=caching_sha2_password"]
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u$$MYSQL_USER -p$$MYSQL_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - ./mysql-data:/var/lib/mysql
+```
+
+Suba o banco:
+
+```bash
+docker compose -f docker-compose.mysql.yml up -d
+```
+
+> **Dica**: se quiser um client web, rode também o Adminer:
+> ```yaml
+>   adminer:
+>     image: adminer
+>     ports:
+>       - "8081:8080"
+> ```
+> Acesse em http://localhost:8081
+
+### Opção B — MySQL local (manual)
+
+Conecte-se como root e execute:
+
+```sql
+CREATE DATABASE IF NOT EXISTS vehicle_manager
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_0900_ai_ci;
+
+CREATE USER IF NOT EXISTS 'admin'@'%' IDENTIFIED BY '12345678';
+GRANT ALL PRIVILEGES ON vehicle_manager.* TO 'admin'@'%';
+FLUSH PRIVILEGES;
+```
+
+## Usuário Administrador Inicial
+
+Há duas formas fáceis de garantir que o banco **inicie com 1 usuário admin** (tabela `users`):
+
+### 1) Usando `import.sql` do Hibernate (automático ao subir)
+
+Crie o arquivo `src/main/resources/import.sql` **no backend** com o conteúdo abaixo **antes** de iniciar a aplicação. E garanta esta linha no `application.properties` (se não existir, adicione):
+
+```
+quarkus.hibernate-orm.sql-load-script=import.sql
+```
+
+> Senha padrão: **Admin@123** (bcrypt).
+
+```sql
+INSERT INTO users (name, email, password, isAdmin)
+VALUES ('Administrador', 'admin@local', '$2b$10$3aUb7M4fyj3Va4oyYxXHNOk3aS6syXZ4S6keju.XZCwGLNr8hxrIu', true)
+ON DUPLICATE KEY UPDATE email = email;
+```
+
+### 2) Inserção manual (após a primeira subida)
+
+Inicie o backend uma vez (para criar as tabelas) e depois execute no MySQL:
+
+```sql
+INSERT INTO users (name, email, password, isAdmin)
+VALUES ('Administrador', 'admin@local', '$2b$10$3aUb7M4fyj3Va4oyYxXHNOk3aS6syXZ4S6keju.XZCwGLNr8hxrIu', true);
+```
+
+> Troque a senha em produção. O hash é **bcrypt/10** da senha `Admin@123`.
+
+## Como rodar o Backend
+
+No diretório do backend:
+
+```bash
+cd vehicle-manager/vehicle-manager/vehicle-manager-backend
+
+# (opcional) conferir Java
+java -version
+
+# Rodar em modo dev (hot reload)
 ./mvnw quarkus:dev
 ```
 
-> **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at <http://localhost:8080/q/dev/>.
+A API sobe por padrão em: **http://localhost:8080**.
 
-## Packaging and running the application
+### Testes (backend)
 
-The application can be packaged using:
-
-```shell script
-./mvnw package
+```bash
+./mvnw test
 ```
 
-It produces the `quarkus-run.jar` file in the `target/quarkus-app/` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/quarkus-app/lib/` directory.
+## Autenticação & Endpoints principais
 
-The application is now runnable using `java -jar target/quarkus-app/quarkus-run.jar`.
+- **Login**: `POST /api/v1/auth/login`
+    - Request JSON:
+      ```json
+      { "email": "admin@local", "password": "Admin@123" }
+      ```
+    - Response:
+      ```json
+      { "accessToken": "...", "refreshToken": "..." }
+      ```
 
-If you want to build an _über-jar_, execute the following command:
+- **Refresh**: `POST /api/v1/auth/refresh`
+    - Request JSON:
+      ```json
+      { "refreshToken": "..." }
+      ```
 
-```shell script
-./mvnw package -Dquarkus.package.jar.type=uber-jar
-```
+- **Usuários** (`/api/v1/users`) – registrar, atualizar, apagar
+- **Marcas** (`/api/v1/brands`), **Modelos** (`/api/v1/modelos`), **Veículos** (`/api/v1/vehicles`)
 
-The application, packaged as an _über-jar_, is now runnable using `java -jar target/*-runner.jar`.
-
-## Creating a native executable
-
-You can create a native executable using:
-
-```shell script
-./mvnw package -Dnative
-```
-
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using:
-
-```shell script
-./mvnw package -Dnative -Dquarkus.native.container-build=true
-```
-
-You can then execute your native executable with: `./target/vehicle-manager-backend-1.0.0-SNAPSHOT-runner`
-
-If you want to learn more about building native executables, please consult <https://quarkus.io/guides/maven-tooling>.
-
-## Related Guides
-
-- REST ([guide](https://quarkus.io/guides/rest)): A Jakarta REST implementation utilizing build time processing and Vert.x. This extension is not compatible with the quarkus-resteasy extension, or any of the extensions that depend on it.
-- Hibernate Validator ([guide](https://quarkus.io/guides/validation)): Validate object properties (field, getter) and method parameters for your beans (REST, CDI, Jakarta Persistence)
-- REST Client ([guide](https://quarkus.io/guides/rest-client)): Call REST services
-- SmallRye OpenAPI ([guide](https://quarkus.io/guides/openapi-swaggerui)): Document your REST APIs with OpenAPI - comes with Swagger UI
-- Hibernate ORM with Panache ([guide](https://quarkus.io/guides/hibernate-orm-panache)): Simplify your persistence code for Hibernate ORM via the active record or the repository pattern
-- SmallRye JWT ([guide](https://quarkus.io/guides/security-jwt)): Secure your applications with JSON Web Token
-- JDBC Driver - MySQL ([guide](https://quarkus.io/guides/datasource)): Connect to the MySQL database via JDBC
-
-## Provided Code
-
-### Hibernate ORM
-
-Create your first JPA entity
-
-[Related guide section...](https://quarkus.io/guides/hibernate-orm)
-
-[Related Hibernate with Panache section...](https://quarkus.io/guides/hibernate-orm-panache)
-
-
-### REST Client
-
-Invoke different services through REST with JSON
-
-[Related guide section...](https://quarkus.io/guides/rest-client)
-
-### REST
-
-Easily start your REST Web Services
-
-[Related guide section...](https://quarkus.io/guides/getting-started-reactive#reactive-jax-rs-resources)
+> O CORS já está habilitado para `*` durante o desenvolvimento em `application.properties`.

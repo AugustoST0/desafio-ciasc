@@ -31,8 +31,8 @@ export class Cadastro implements OnInit {
         '',
         [Validators.required, Validators.email, Validators.maxLength(150)],
       ],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-      confirmPassword: ['', [Validators.required, Validators.minLength(6)]],
+      password: ['', [Validators.required, Validators.minLength(5)]],
+      confirmPassword: ['', [Validators.required, Validators.minLength(5)]],
       admin: [false],
     });
   }
