@@ -157,8 +157,8 @@ npm start
 
 O script `db/init/01-seed.sql` cria usuários padrão na tabela `users`:
 
-- **admin** — email `admin@exemplo.com` — `isAdmin = 1`
-- **user**  — email `user@exemplo.com`  — `isAdmin = 0`
+- **admin** — email `admin@exemplo.com` — senha `admin`
+- **user**  — email `user@exemplo.com`  — senha `12345`
 
 As senhas no seed estão **com hash Bcrypt**. Caso não saiba a senha em texto puro, você tem duas opções:
 
@@ -254,5 +254,3 @@ docker compose logs -f frontend
 - **Swagger UI (dev, se habilitado)**: http://localhost:8080/q/swagger-ui
 
 ---
-
-Se quiser, eu também posso gerar **READMEs separados** (backend e frontend) com instruções específicas, ou adicionar **scripts `Makefile`/`npm run`** para encurtar os comandos do dia‑a‑dia.
